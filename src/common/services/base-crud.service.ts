@@ -6,7 +6,10 @@ import stringToJson from '../../common/utils/string-to-json.util';
 import { queryBuilderCriteria } from '../../common/utils/query-builder-criteria.util';
 import { BaseResponseType } from '../types/generic-response.type';
 import { handleError } from '../../common/utils/handle-error.util';
-import { excludePropertiesItem, excludePropertiesUtil } from '../utils/exclude-properties.util';
+import {
+  excludePropertiesItem,
+  excludePropertiesUtil,
+} from '../utils/exclude-properties.util';
 import { ListPageCriteriaDto } from '../dtos/list-page-criteria.dto';
 
 @Injectable()
@@ -16,14 +19,19 @@ export class BaseCrudService<T extends { id: number }, WhereInput> {
     private readonly model: Prisma.ModelName,
   ) {}
 
-  async create<CreateInput>(data: CreateInput, excludeProperties?: Array<string>): Promise<T> {
+  async create<CreateInput>(
+    data: CreateInput,
+    excludeProperties?: Array<string>,
+  ): Promise<T> {
     try {
-      let res = await this.prismaClient[this.model].create({ data }).catch(handleError);
+      let res = await this.prismaClient[this.model].create({ data });
+      // .catch(handleError);
       if (excludeProperties) {
         res = excludePropertiesItem(res, excludeProperties);
       }
       return res;
     } catch (error) {
+      console.log('error', error);
       handleError(error);
     }
   }
@@ -96,9 +104,12 @@ export class BaseCrudService<T extends { id: number }, WhereInput> {
       if (defaultFilters) conditions = defaultFilters;
       conditions = {
         ...conditions,
-        ...(query && queryBuilderCriteria<WhereInput>(query, ['question', 'answer'])),
+        ...(query &&
+          queryBuilderCriteria<WhereInput>(query, ['question', 'answer'])),
       };
-      const total = await this.prismaClient[this.model].count({ where: conditions });
+      const total = await this.prismaClient[this.model].count({
+        where: conditions,
+      });
       let res = await this.prismaClient[this.model].findMany({
         ...(includeProperties && { include: includeProperties }),
         ...(!(take === 0 && skip === 0) && {

@@ -4,6 +4,8 @@ import { Prisma, PrismaClient, User } from '@prisma/client';
 import { UserDto } from './dtos/user.dto';
 import * as bcrypt from 'bcryptjs';
 import { ChangePasswordDto } from './dtos/change-password.dto';
+import { RegisterDto } from '../auth/dtos/register.dto';
+import { RolesEnum } from '../../common/enums/roles.enum';
 
 @Injectable()
 export class UsersService extends BaseCrudService<User, Prisma.UserWhereInput> {
@@ -34,5 +36,12 @@ export class UsersService extends BaseCrudService<User, Prisma.UserWhereInput> {
     const hashedPassword = await bcrypt.hash(data.newPassword, 12);
     const payload: UserDto = { ...user, password: hashedPassword };
     return this.update<UserDto>(id, payload, ['password']);
+  }
+  async register({ email, password }: RegisterDto): Promise<User> {
+    return this.createCustom({
+      email,
+      password,
+      roleId: RolesEnum.CUSTOMER,
+    });
   }
 }

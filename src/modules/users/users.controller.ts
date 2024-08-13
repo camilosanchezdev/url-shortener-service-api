@@ -25,7 +25,9 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  getList(@Query() criteria: ListPageCriteriaDto): Promise<ListPageResponse<User>> {
+  getList(
+    @Query() criteria: ListPageCriteriaDto,
+  ): Promise<ListPageResponse<User>> {
     return this.usersService.list<Prisma.UserWhereInput>(
       criteria,
       { deleted: false },
@@ -49,7 +51,10 @@ export class UsersController {
     return this.usersService.findOne(id, null, ['password']);
   }
   @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() payload: UpdateUserDto): Promise<User> {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: UpdateUserDto,
+  ): Promise<User> {
     return this.usersService.update<UpdateUserDto>(id, payload, ['password']);
   }
   @Delete(':id')

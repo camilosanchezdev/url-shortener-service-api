@@ -6,6 +6,8 @@ import * as bcrypt from 'bcryptjs';
 import { UsersService } from '../users/users.service';
 import { TokenType } from './types/token.type';
 import { AuthResponseType } from './types/auth-response.type';
+import { RegisterDto } from './dtos/register.dto';
+import { BaseResponseType } from '../../common/types/generic-response.type';
 
 @Injectable()
 export class AuthService {
@@ -34,5 +36,12 @@ export class AuthService {
       }
     }
     return null;
+  }
+  async register(payload: RegisterDto): Promise<BaseResponseType> {
+    const user = await this.usersService.register(payload);
+    if (user) {
+      return { success: true };
+    }
+    return { success: false };
   }
 }

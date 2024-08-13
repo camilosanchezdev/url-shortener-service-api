@@ -27,6 +27,23 @@ model User {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
   deleted   Boolean   @default(false)
+  Url       Url[]
 
   @@map("users")
+}
+
+model Url {
+  id          Int       @id @default(autoincrement()) @map("url_id")
+  title       String?
+  originalUrl String    @map("original_url")
+  shortCode   String    @unique @map("short_dode")
+  clicks      Int       @default(0)
+  user        User?     @relation(fields: [userId], references: [id])
+  userId      Int?      @map("user_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime? @updatedAt @map("updated_at")
+  expiresAt   DateTime? @map("expires_at")
+  deleted     Boolean   @default(false)
+
+  @@map("urls")
 }

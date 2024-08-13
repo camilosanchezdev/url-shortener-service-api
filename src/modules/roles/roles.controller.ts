@@ -22,8 +22,12 @@ import { RolesService } from './roles.service';
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
   @Get()
-  getList(@Query() criteria: ListPageCriteriaDto): Promise<ListPageResponse<Role>> {
-    return this.rolesService.list<Prisma.RoleWhereInput>(criteria, { deleted: false });
+  getList(
+    @Query() criteria: ListPageCriteriaDto,
+  ): Promise<ListPageResponse<Role>> {
+    return this.rolesService.list<Prisma.RoleWhereInput>(criteria, {
+      deleted: false,
+    });
   }
   @Post()
   create(@Body() payload: RoleDto): Promise<Role> {
@@ -34,7 +38,10 @@ export class RolesController {
     return this.rolesService.findOne(id);
   }
   @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() payload: RoleDto): Promise<Role> {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: RoleDto,
+  ): Promise<Role> {
     return this.rolesService.update<RoleDto>(id, payload);
   }
   @Delete(':id')

@@ -6,6 +6,8 @@ import {
 } from '@nestjs/common';
 
 export function handleError(error: any): never {
+  console.log('=>(handle-error.util.ts:9) error', error);
+
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     // Handle known errors from Prisma
     switch (error.code) {
