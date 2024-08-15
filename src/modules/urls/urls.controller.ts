@@ -90,9 +90,11 @@ export class UrlsController {
   }
 
   // Public
-  @Get('/customer/:shortCode')
-  getByShortCode(@Param('shortCode') shortCode: string): Promise<Url> {
-    return this.engineService.findOne(null, { shortCode });
+  @Get('/short/:shortCode')
+  getByShortCode(
+    @Param('shortCode') shortCode: string,
+  ): Promise<{ url: string }> {
+    return this.engineService.findOneByShortCode(shortCode);
   }
   // Admin
 

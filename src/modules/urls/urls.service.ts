@@ -49,4 +49,20 @@ export class UrlsService extends BaseCrudService<Url, Prisma.UrlWhereInput> {
       throw e;
     }
   }
+  async findOneByShortCode(shortCode: string): Promise<{ url: string }> {
+    try {
+      const response = await this.findOne(null, { shortCode });
+      if (!response) this.withoutRecordsError();
+
+      // Add click
+      await this.update(response.id, {
+        clicks: response.clicks + 1,
+      });
+
+      const { originalUrl: url } = response;
+      return { url };
+    } catch (e) {
+      throw e;
+    }
+  }
 }
