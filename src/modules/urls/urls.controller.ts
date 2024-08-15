@@ -28,7 +28,62 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 @ApiTags('Urls')
 export class UrlsController {
   constructor(private readonly engineService: UrlsService) {}
+  // Customer
 
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles(RolesEnum.CUSTOMER)
+  @Post('/customer')
+  createByCustomer(
+    @Body() payload: UrlDto,
+    @CurrentUser() customer: TokenType,
+  ): Promise<Url> {
+    const customerId = customer.sub;
+    return this.engineService.createCustom(payload, customerId);
+  }
+
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles(RolesEnum.CUSTOMER)
+  @Get('/customer')
+  getByCustomer(
+    @Query() criteria: ListPageCriteriaDto,
+    @CurrentUser() customer: TokenType,
+  ): Promise<ListPageResponse<Url>> {
+    const customerId = customer.sub;
+    return this.engineService.list<Prisma.UrlWhereInput>(criteria, {
+      deleted: false,
+      user: {
+        id: customerId,
+      },
+    });
+  }
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles(RolesEnum.CUSTOMER)
+  @Put('customer/:id')
+  updateByCustomer(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: UrlDto,
+    @CurrentUser() customer: TokenType,
+  ): Promise<Url> {
+    const customerId = customer.sub;
+    return this.engineService.updateByCustomer(id, payload, customerId);
+  }
+
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles(RolesEnum.CUSTOMER)
+  @Delete('customer/:id')
+  removeByCustomer(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() customer: TokenType,
+  ): Promise<BaseResponseType> {
+    const customerId = customer.sub;
+    return this.engineService.removeByCustomer(id, customerId);
+  }
+
+  // Public
+  @Get('/customer/:shortCode')
+  getByShortCode(@Param('shortCode') shortCode: string): Promise<Url> {
+    return this.engineService.findOne(null, { shortCode });
+  }
   // Admin
 
   @UseGuards(AuthGuard('jwt'), RoleGuard)
@@ -71,24 +126,5 @@ export class UrlsController {
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number): Promise<BaseResponseType> {
     return this.engineService.remove(id);
-  }
-
-  // Customer
-
-  @UseGuards(AuthGuard('jwt'), RoleGuard)
-  @Roles(RolesEnum.CUSTOMER)
-  @Post('/customer')
-  createByCustomer(
-    @Body() payload: UrlDto,
-    @CurrentUser() customer: TokenType,
-  ): Promise<Url> {
-    const customerId = customer.sub;
-    return this.engineService.createCustom(payload, customerId);
-  }
-
-  // Public
-  @Get('/customer/:shortCode')
-  getByShortCode(@Param('shortCode') shortCode: string): Promise<Url> {
-    return this.engineService.findOne(null, { shortCode });
   }
 }
