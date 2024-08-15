@@ -45,7 +45,9 @@ export class BaseCrudService<T extends { id: number }, WhereInput> {
       let res = await this.prismaClient[this.model]
         .findUnique({ where: { ...(id && { id: id }), ...conditions } })
         .catch(handleError);
-
+      if (!res) {
+        throw new NotFoundException();
+      }
       if (excludeProperties) {
         res = excludePropertiesItem(res, excludeProperties);
       }

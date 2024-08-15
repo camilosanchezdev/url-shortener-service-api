@@ -78,6 +78,16 @@ export class UrlsController {
     const customerId = customer.sub;
     return this.engineService.removeByCustomer(id, customerId);
   }
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles(RolesEnum.CUSTOMER)
+  @Get('customer/:id')
+  findOneByCustomer(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() customer: TokenType,
+  ): Promise<Url> {
+    const customerId = customer.sub;
+    return this.engineService.findOne(id, { user: { id: customerId } });
+  }
 
   // Public
   @Get('/customer/:shortCode')
