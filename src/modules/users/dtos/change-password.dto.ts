@@ -6,4 +6,9 @@ export class ChangePasswordDto {
   @IsString()
   @IsNotEmpty()
   newPassword: string;
+
+  @ApiProperty({ example: '123' })
+  @IsString()
+  @IsNotEmpty()
+  oldPassword: string;
 }
