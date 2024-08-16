@@ -71,6 +71,8 @@ export class UsersController {
     return this.usersService.getInformation(customerId);
   }
 
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles(RolesEnum.ADMIN)
   @Get()
   getList(
     @Query() criteria: ListPageCriteriaDto,
@@ -89,14 +91,23 @@ export class UsersController {
       },
     );
   }
+
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles(RolesEnum.ADMIN)
   @Post()
   create(@Body() payload: UserDto): Promise<User> {
     return this.usersService.createCustom(payload);
   }
+
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles(RolesEnum.ADMIN)
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
     return this.usersService.findOne(id, null, ['password']);
   }
+
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles(RolesEnum.ADMIN)
   @Put(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -104,6 +115,9 @@ export class UsersController {
   ): Promise<User> {
     return this.usersService.update<UpdateUserDto>(id, payload, ['password']);
   }
+
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles(RolesEnum.ADMIN)
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number): Promise<BaseResponseType> {
     return this.usersService.remove(id);

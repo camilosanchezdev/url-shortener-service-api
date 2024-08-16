@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ListPageCriteriaDto } from '../../common/dtos/list-page-criteria.dto';
 import { ListPageResponse } from '../../common/types/list-page-response.type';
@@ -16,7 +17,13 @@ import { BaseResponseType } from '../../common/types/generic-response.type';
 import { ApiTags } from '@nestjs/swagger';
 import { RoleDto } from './dtos/role.dto';
 import { RolesService } from './roles.service';
+import { AuthGuard } from '@nestjs/passport';
+import { RoleGuard } from '../auth/guards/role.guard';
+import { Roles } from '../auth/decorators/role.decorator';
+import { RolesEnum } from '../../common/enums/roles.enum';
 
+@UseGuards(AuthGuard('jwt'), RoleGuard)
+@Roles(RolesEnum.ADMIN)
 @Controller('roles')
 @ApiTags('Roles')
 export class RolesController {
