@@ -12,10 +12,14 @@ import { RegisterDto } from '../auth/dtos/register.dto';
 import { RolesEnum } from '../../common/enums/roles.enum';
 import { BaseResponseType } from '../../common/types/generic-response.type';
 import { UpdateInformationDto } from './dtos/update-information.dto';
+import { UrlsService } from '../urls/urls.service';
 
 @Injectable()
 export class UsersService extends BaseCrudService<User, Prisma.UserWhereInput> {
-  constructor(private readonly prisma: PrismaClient) {
+  constructor(
+    private readonly prisma: PrismaClient,
+    private readonly urlsService: UrlsService,
+  ) {
     super(prisma, 'User');
   }
   async createCustom(data: UserDto): Promise<User> {
@@ -77,5 +81,12 @@ export class UsersService extends BaseCrudService<User, Prisma.UserWhereInput> {
       }
       throw e;
     }
+  }
+  async removeAccount(customerId: number): Promise<BaseResponseType> {
+    // Mark user as deleted
+    await this.update(customerId, { deleted: true });
+
+    // Mark all active URLs as deleted
+    return await this.urlsService.markAllUrlsAsDeleted(customerId);
   }
 }

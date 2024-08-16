@@ -7,5 +7,6 @@ import { UrlsService } from './urls.service';
 @Module({
   controllers: [UrlsController],
   providers: [UrlsService, PrismaClient],
+  exports: [UrlsService],
 })
 export class UrlsModule {}

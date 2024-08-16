@@ -65,4 +65,16 @@ export class UrlsService extends BaseCrudService<Url, Prisma.UrlWhereInput> {
       throw e;
     }
   }
+  async markAllUrlsAsDeleted(customerId: number): Promise<BaseResponseType> {
+    try {
+      await this.prisma['url'].updateMany({
+        where: { user: { id: customerId }, deleted: false },
+        data: { deleted: true },
+      });
+
+      return { success: true };
+    } catch (e) {
+      throw e;
+    }
+  }
 }

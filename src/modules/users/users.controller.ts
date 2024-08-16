@@ -33,7 +33,13 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   // Customer
-
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles(RolesEnum.CUSTOMER)
+  @Delete('remove-account')
+  removeAccount(@CurrentUser() customer: TokenType): Promise<BaseResponseType> {
+    const customerId = customer.sub;
+    return this.usersService.removeAccount(customerId);
+  }
   @UseGuards(AuthGuard('jwt'), RoleGuard)
   @Roles(RolesEnum.CUSTOMER)
   @Put('change-password')
