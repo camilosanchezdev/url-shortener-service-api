@@ -23,13 +23,22 @@ import { Roles } from '../auth/decorators/role.decorator';
 import { RolesEnum } from '../../common/enums/roles.enum';
 import { TokenType } from '../auth/types/token.type';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { DashboardResponseInterface } from './interfaces/dashboard-response.interface';
 
 @Controller('urls')
 @ApiTags('Urls')
 export class UrlsController {
   constructor(private readonly engineService: UrlsService) {}
   // Customer
-
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles(RolesEnum.CUSTOMER)
+  @Get('/dashboard')
+  dashboard(
+    @CurrentUser() customer: TokenType,
+  ): Promise<DashboardResponseInterface> {
+    const customerId = customer.sub;
+    return this.engineService.dashboard(customerId);
+  }
   @UseGuards(AuthGuard('jwt'), RoleGuard)
   @Roles(RolesEnum.CUSTOMER)
   @Post('/customer')

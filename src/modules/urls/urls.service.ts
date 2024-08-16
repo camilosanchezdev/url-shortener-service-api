@@ -4,6 +4,7 @@ import { Prisma, PrismaClient, Url } from '@prisma/client';
 import { UrlDto } from './dtos/url.dto';
 import generateShortCode from '../../common/utils/generate-short-code.util';
 import { BaseResponseType } from '../../common/types/generic-response.type';
+import { DashboardResponseInterface } from './interfaces/dashboard-response.interface';
 
 @Injectable()
 export class UrlsService extends BaseCrudService<Url, Prisma.UrlWhereInput> {
@@ -76,5 +77,29 @@ export class UrlsService extends BaseCrudService<Url, Prisma.UrlWhereInput> {
     } catch (e) {
       throw e;
     }
+  }
+  async dashboard(customerId: number): Promise<DashboardResponseInterface> {
+    const conditions = { user: { id: customerId }, deleted: false };
+    const res = await this.prisma['url'].aggregate({
+      _sum: {
+        clicks: true,
+      },
+      where: conditions,
+    });
+    const clicks = res._sum.clicks ?? 0;
+
+    return {
+      count: await this.prisma['url'].count({
+        where: conditions,
+      }),
+      clicks: clicks,
+      urls: await this.prisma['url'].findMany({
+        where: conditions,
+        orderBy: {
+          clicks: 'desc',
+        },
+        take: 3,
+      }),
+    };
   }
 }
