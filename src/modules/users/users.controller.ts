@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
 import { UsersService } from './users.service';
@@ -18,11 +19,28 @@ import { UserDto } from './dtos/user.dto';
 import { BaseResponseType } from '../../common/types/generic-response.type';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { ChangePasswordDto } from './dtos/change-password.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { RoleGuard } from '../auth/guards/role.guard';
+import { Roles } from '../auth/decorators/role.decorator';
+import { RolesEnum } from '../../common/enums/roles.enum';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { TokenType } from '../auth/types/token.type';
 
 @Controller('users')
 @ApiTags('Users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles(RolesEnum.CUSTOMER)
+  @Put('change-password')
+  changePassword(
+    @Body() payload: ChangePasswordDto,
+    @CurrentUser() customer: TokenType,
+  ): Promise<BaseResponseType> {
+    const customerId = customer.sub;
+    return this.usersService.changePassword(customerId, payload);
+  }
 
   @Get()
   getList(
@@ -60,12 +78,5 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number): Promise<BaseResponseType> {
     return this.usersService.remove(id);
-  }
-  @Put('change-password/:id')
-  changePassword(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() payload: ChangePasswordDto,
-  ): Promise<User> {
-    return this.usersService.changePassword(id, payload);
   }
 }

@@ -10,6 +10,7 @@ import * as bcrypt from 'bcryptjs';
 import { ChangePasswordDto } from './dtos/change-password.dto';
 import { RegisterDto } from '../auth/dtos/register.dto';
 import { RolesEnum } from '../../common/enums/roles.enum';
+import { BaseResponseType } from '../../common/types/generic-response.type';
 
 @Injectable()
 export class UsersService extends BaseCrudService<User, Prisma.UserWhereInput> {
@@ -31,15 +32,19 @@ export class UsersService extends BaseCrudService<User, Prisma.UserWhereInput> {
       throw e;
     }
   }
-  async changePassword(id: number, data: ChangePasswordDto): Promise<User> {
+  async changePassword(
+    id: number,
+    { newPassword, currentPassword }: ChangePasswordDto,
+  ): Promise<BaseResponseType> {
     const user = await this.findOne(id);
-    const isMatch = await bcrypt.compare(data.oldPassword, user.password);
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
-      throw new BadRequestException('Invalid old password');
+      throw new BadRequestException('Invalid current password');
     }
-    const hashedPassword = await bcrypt.hash(data.newPassword, 12);
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
     const payload: UserDto = { ...user, password: hashedPassword };
-    return this.update<UserDto>(id, payload, ['password']);
+    await this.update<UserDto>(id, payload, ['password']);
+    return { success: true };
   }
 
   async register({ email, password, name }: RegisterDto): Promise<User> {

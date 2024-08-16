@@ -31,7 +31,6 @@ export class BaseCrudService<T extends { id: number }, WhereInput> {
       }
       return res;
     } catch (error) {
-      console.log('error', error);
       handleError(error);
     }
   }
