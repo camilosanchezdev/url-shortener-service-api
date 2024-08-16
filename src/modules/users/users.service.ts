@@ -63,16 +63,17 @@ export class UsersService extends BaseCrudService<User, Prisma.UserWhereInput> {
   async updateInformation(
     id: number,
     { name, email }: UpdateInformationDto,
-  ): Promise<User> {
+  ): Promise<BaseResponseType> {
     try {
       await this.findOne(null, {
         email,
         NOT: { id: { equals: id } },
       });
-      throw new BadRequestException('Email already in use');
+      return { success: false, error: 'Email already in use' };
     } catch (e) {
       if (e instanceof NotFoundException) {
-        return this.update(id, { name, email }, ['password', 'roleId']);
+        await this.update(id, { name, email }, ['password', 'roleId']);
+        return { success: true };
       }
       throw e;
     }

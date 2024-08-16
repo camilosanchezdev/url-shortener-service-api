@@ -47,10 +47,10 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'), RoleGuard)
   @Roles(RolesEnum.CUSTOMER)
   @Put('information')
-  getInformation(
+  updateInformation(
     @Body() payload: UpdateInformationDto,
     @CurrentUser() customer: TokenType,
-  ): Promise<{ name: string; email: string }> {
+  ): Promise<BaseResponseType> {
     const customerId = customer.sub;
     return this.usersService.updateInformation(customerId, payload);
   }
@@ -58,7 +58,7 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt'), RoleGuard)
   @Roles(RolesEnum.CUSTOMER)
   @Get('information')
-  updateInformation(
+  getInformation(
     @CurrentUser() customer: TokenType,
   ): Promise<{ name: string; email: string }> {
     const customerId = customer.sub;
