@@ -25,11 +25,14 @@ import { Roles } from '../auth/decorators/role.decorator';
 import { RolesEnum } from '../../common/enums/roles.enum';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { TokenType } from '../auth/types/token.type';
+import { UpdateInformationDto } from './dtos/update-information.dto';
 
 @Controller('users')
 @ApiTags('Users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  // Customer
 
   @UseGuards(AuthGuard('jwt'), RoleGuard)
   @Roles(RolesEnum.CUSTOMER)
@@ -40,6 +43,26 @@ export class UsersController {
   ): Promise<BaseResponseType> {
     const customerId = customer.sub;
     return this.usersService.changePassword(customerId, payload);
+  }
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles(RolesEnum.CUSTOMER)
+  @Put('information')
+  getInformation(
+    @Body() payload: UpdateInformationDto,
+    @CurrentUser() customer: TokenType,
+  ): Promise<{ name: string; email: string }> {
+    const customerId = customer.sub;
+    return this.usersService.updateInformation(customerId, payload);
+  }
+
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Roles(RolesEnum.CUSTOMER)
+  @Get('information')
+  updateInformation(
+    @CurrentUser() customer: TokenType,
+  ): Promise<{ name: string; email: string }> {
+    const customerId = customer.sub;
+    return this.usersService.getInformation(customerId);
   }
 
   @Get()

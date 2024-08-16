@@ -11,6 +11,7 @@ import { ChangePasswordDto } from './dtos/change-password.dto';
 import { RegisterDto } from '../auth/dtos/register.dto';
 import { RolesEnum } from '../../common/enums/roles.enum';
 import { BaseResponseType } from '../../common/types/generic-response.type';
+import { UpdateInformationDto } from './dtos/update-information.dto';
 
 @Injectable()
 export class UsersService extends BaseCrudService<User, Prisma.UserWhereInput> {
@@ -54,5 +55,26 @@ export class UsersService extends BaseCrudService<User, Prisma.UserWhereInput> {
       name,
       roleId: RolesEnum.CUSTOMER,
     });
+  }
+  async getInformation(id: number): Promise<{ name: string; email: string }> {
+    const { name, email } = await this.findOne(id);
+    return { name, email };
+  }
+  async updateInformation(
+    id: number,
+    { name, email }: UpdateInformationDto,
+  ): Promise<User> {
+    try {
+      await this.findOne(null, {
+        email,
+        NOT: { id: { equals: id } },
+      });
+      throw new BadRequestException('Email already in use');
+    } catch (e) {
+      if (e instanceof NotFoundException) {
+        return this.update(id, { name, email }, ['password', 'roleId']);
+      }
+      throw e;
+    }
   }
 }
