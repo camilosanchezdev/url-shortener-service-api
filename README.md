@@ -48,6 +48,9 @@ src/
 │   ├── users/            # User management module
 │   │   ├── dtos/         # User-related DTOs
 ```
+## Frontend
+
+[Frontend Repository](https://github.com/camilosanchezdev/url-shortener-service)
 
 ## Setup
 
